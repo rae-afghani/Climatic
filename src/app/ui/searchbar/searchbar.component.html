@@ -1,1 +1,8 @@
-<p>searchbar works!</p>
+<div class="search-bar-container">
+    <button mat-icon-button>
+        <mat-icon>search</mat-icon>
+    </button>
+    <input #searchInput placeholder="Search the location"
+    (keydown.ENTER)="search(searchInput.value)"
+    />
+</div>
