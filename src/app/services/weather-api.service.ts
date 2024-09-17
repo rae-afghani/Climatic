@@ -16,6 +16,7 @@ export class WeatherApiService {
   //   return this.http.get<any>(`${this.apiUrl}/forecast.json?key=${this.apiKey}&q=${location}&days=7&aqi=no`);
   // }
 
+  
   getWeather(location: string, days: number = 7): Observable<any> {
     const params = new HttpParams()
       .set('key', this.apiKey)

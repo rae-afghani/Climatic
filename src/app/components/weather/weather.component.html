@@ -1,1 +1,232 @@
-<p>weather works!</p>
+<div class="page" *ngIf="weatherData">
+    <div class="header">
+        <p class="subtitle">My location</p>
+        <h1 class="title">{{ weatherData.location.name }}, {{ weatherData.location.region }}</h1>
+        <div class="datetime-container">
+            <div class="datetime">
+                <mat-icon>calendar_today</mat-icon>
+                <p class="datetime">{{ formattedDate }}</p>
+            </div>
+            <div class="datetime">
+                <mat-icon>schedule</mat-icon>
+                <p class="datetime">{{ formattedTime }}</p>
+            </div>
+
+
+
+        </div>
+
+    </div>
+
+    <div class="section">
+        <div class="container-card">
+            <p class="subtitle">Today</p>
+            <h2>
+                    {{
+                    getTemperature(
+                    weatherData.current.temp_c,
+                    weatherData.current.temp_f
+                    )
+                    }}°
+            </h2>
+        </div>
+        <div class="container-card">
+            <p class="subtitle">Tomrrow</p>
+            <h2>
+                    {{
+                    getTemperature(
+                    weatherData.current.temp_c,
+                    weatherData.current.temp_f
+                    )
+                    }}°
+            </h2>
+        </div>
+        <div class="container-card">
+            <p class="subtitle">Eventually</p>
+            <h2>
+                    {{
+                    getTemperature(
+                    weatherData.current.temp_c,
+                    weatherData.current.temp_f
+                    )
+                    }}°
+            </h2>
+        </div>
+
+
+    </div>
+</div>
+
+
+<div class="main-container">
+    <mat-card class="container-card">
+        <div class="container-search">
+            <app-searchbar (searchClicked)="handleSearch($event)" />
+            <!-- Error message -->
+            <div class="error-message" *ngIf="errorMessage">
+                {{ errorMessage }}
+            </div>
+        </div>
+
+        <div class="container-tabs-group" *ngIf="weatherData">
+            <div class="toggle-container">
+                <!-- <form [formGroup]="toggleForm">
+                    <mat-radio-group formControlName="unit">
+                        <mat-radio-button color="primary" [value]="1">°C</mat-radio-button>
+                        <mat-radio-button color="primary" [value]="2">°F</mat-radio-button>
+                    </mat-radio-group>
+                </form> -->
+                <form [formGroup]="metricForm">
+                    <mat-slide-toggle formControlName="unit" [checked]="unitControl.value === 1"
+                        [disabled]="unitControl.value === 2">
+                    </mat-slide-toggle>
+                </form>
+            </div>
+
+            <mat-tab-group>
+                <mat-tab label="Weather">
+                    <div class="weather-container">
+                        <div class="weather-card">
+                            <div class="weather-header">
+                                <h4>
+                                    Today in {{ weatherData.location.name }},
+                                    {{ weatherData.location.country }}
+                                </h4>
+                                <img [src]="weatherData.current.condition.icon" alt="Weather icon" />
+                            </div>
+
+                            <div class="weather-details">
+                                <div class="weather-column">
+                                    <div class="line-item">
+                                        <mat-icon>thermostat</mat-icon>
+                                        <p>
+                                            Temperature:
+                                            {{
+                                            getTemperature(
+                                            weatherData.current.temp_c,
+                                            weatherData.current.temp_f
+                                            )
+                                            }}°
+                                            {{ metricForm.get("unit")?.value === 1 ? "C" : "F" }}
+                                        </p>
+                                    </div>
+                                    <div class="line-item">
+                                        <mat-icon>cloud</mat-icon>
+                                        <p>Condition: {{ weatherData.current.condition.text }}</p>
+                                    </div>
+                                    <div class="line-item">
+                                        <mat-icon>air</mat-icon>
+                                        <p>Wind Speed: {{ weatherData.current.wind_kph }} kph</p>
+                                    </div>
+                                </div>
+                                <div class="weather-column">
+                                    <div class="line-item">
+                                        <mat-icon>explore</mat-icon>
+                                        <p>Wind Direction: {{ weatherData.current.wind_dir }}</p>
+                                    </div>
+                                    <div class="line-item">
+                                        <mat-icon>opacity</mat-icon>
+                                        <p>Humidity: {{ weatherData.current.humidity }}%</p>
+                                    </div>
+                                    <div class="line-item">
+                                        <mat-icon>compress</mat-icon>
+                                        <p>Pressure: {{ weatherData.current.pressure_mb }} mb</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </mat-tab>
+
+                <mat-tab label="Forecast" *ngIf="weatherData">
+                    <div class="forecast-container">
+                        <div *ngFor="let day of weatherData.forecast.forecastday" class="forecast-card">
+                            <div class="forecast-header">
+                                <h4>{{ day.date | date }}</h4>
+                                <img [src]="day.day.condition.icon" alt="Weather icon" />
+                            </div>
+                            <div class="forecast-details">
+                                <div class="forecast-item">
+                                    <mat-icon>thermostat</mat-icon>
+                                    <p>
+                                        Max Temp:
+                                        {{ getTemperature(day.day.maxtemp_c, day.day.maxtemp_f) }}°
+                                        {{ metricForm.get("unit")?.value === 1 ? "C" : "F" }}
+                                    </p>
+                                </div>
+                                <div class="forecast-item">
+                                    <mat-icon>thermostat</mat-icon>
+                                    <p>
+                                        Min Temp:
+                                        {{ getTemperature(day.day.mintemp_c, day.day.mintemp_f) }}°
+                                        {{ metricForm.get("unit")?.value === 1 ? "C" : "F" }}
+                                    </p>
+                                </div>
+                                <div class="forecast-item">
+                                    <mat-icon>cloud</mat-icon>
+                                    <p>Condition: {{ day.day.condition.text }}</p>
+                                </div>
+                                <div class="forecast-item">
+                                    <mat-icon>air</mat-icon>
+                                    <p>Wind Speed: {{ day.day.maxwind_kph }} kph</p>
+                                </div>
+                                <div class="forecast-item">
+                                    <mat-icon>opacity</mat-icon>
+                                    <p>Humidity: {{ day.day.avghumidity }}%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </mat-tab>
+
+                <mat-tab label="Location">
+                    <div class="location-container">
+                        <div class="location-card">
+                            <div class="line-item">
+                                <h4>
+                                    <mat-icon>place</mat-icon> {{ weatherData.location.name }},
+                                    {{ weatherData.location.country }}
+                                </h4>
+                            </div>
+
+                            <div class="line-item">
+                                <mat-icon>my_location</mat-icon>
+                                <p>Region: {{ weatherData.location.region }}</p>
+                            </div>
+
+                            <div class="line-item">
+                                <mat-icon>public</mat-icon>
+                                <p>Country: {{ weatherData.location.country }}</p>
+                            </div>
+
+                            <div class="line-item">
+                                <mat-icon>location_city</mat-icon>
+                                <p>City: {{ weatherData.location.name }}</p>
+                            </div>
+
+                            <div class="line-item">
+                                <mat-icon>schedule</mat-icon>
+                                <p>Local Time: {{ weatherData.location.localtime }}</p>
+                            </div>
+
+                            <div class="line-item">
+                                <mat-icon>gps_fixed</mat-icon>
+                                <p>Latitude: {{ weatherData.location.lat }}</p>
+                            </div>
+
+                            <div class="line-item">
+                                <mat-icon>gps_not_fixed</mat-icon>
+                                <p>Longitude: {{ weatherData.location.lon }}</p>
+                            </div>
+
+                            <div class="line-item">
+                                <mat-icon>access_time</mat-icon>
+                                <p>Time Zone: {{ weatherData.location.tz_id }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+    </mat-card>
+</div>
